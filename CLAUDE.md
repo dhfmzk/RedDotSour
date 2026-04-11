@@ -12,7 +12,7 @@
 - **Unity 2022.3** (LTS)
 - **C#** (.NET Standard 2.1)
 - **Built-in Render Pipeline**
-- **TextMeshPro** (UI 텍스트)
+
 
 ## v2.0 아키텍처 (목표)
 
@@ -53,7 +53,7 @@ Assets/RedDotSour/           ← UPM 패키지 루트
 - 프로퍼티/메서드: `PascalCase`
 - `this.` 접근자 사용
 - 라이브러리 코드에 `MonoBehaviour` 의존 최소화 (Core/Persistence는 순수 C#)
-- 외부 의존성 금지 (Unity 내장 + TMP만 허용)
+- 외부 의존성 금지 (Unity 내장만 허용)
 
 ## 빌드 & 테스트
 
