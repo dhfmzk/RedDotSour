@@ -1,3 +1,5 @@
+using System;
+
 namespace RedDotSour.Core
 {
     public interface IRedDotContainer
@@ -5,5 +7,10 @@ namespace RedDotSour.Core
         bool IsOnAny();
         int CountOn();
         void ClearAll();
+
+        event Action OnChanged;
+
+        int DirtyCount { get; }
+        void ClearDirty();
     }
 }

@@ -35,7 +35,13 @@ namespace RedDotSour.Core
                 return null;
             }
 
-            return container as RedDotContainer<TKey>;
+            if (container is not RedDotContainer<TKey> typed)
+            {
+                throw new InvalidCastException(
+                    $"Category '{category}' has key type mismatch. Expected {typeof(TKey).Name}.");
+            }
+
+            return typed;
         }
 
         /// <summary>
