@@ -27,7 +27,7 @@ namespace RedDotSour.Tests
         [Test]
         public void Create_ReturnsContainer()
         {
-            var container = this._redDot.Create<int>(TestCategory.Inventory);
+            var container = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
 
             Assert.IsNotNull(container);
         }
@@ -35,17 +35,17 @@ namespace RedDotSour.Tests
         [Test]
         public void Create_DuplicateCategory_ThrowsInvalidOperationException()
         {
-            this._redDot.Create<int>(TestCategory.Inventory);
+            this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
 
             Assert.Throws<InvalidOperationException>(() =>
-                this._redDot.Create<int>(TestCategory.Inventory));
+                this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse));
         }
 
         [Test]
         public void Create_DifferentCategories_DifferentKeyTypes()
         {
-            var intContainer = this._redDot.Create<int>(TestCategory.Inventory);
-            var longContainer = this._redDot.Create<long>(TestCategory.Quest);
+            var intContainer = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
+            var longContainer = this._redDot.Create<long>(TestCategory.Quest, k => k.ToString(), long.Parse);
 
             Assert.IsNotNull(intContainer);
             Assert.IsNotNull(longContainer);
@@ -58,7 +58,7 @@ namespace RedDotSour.Tests
         [Test]
         public void Get_ExistingCategory_ReturnsContainer()
         {
-            this._redDot.Create<int>(TestCategory.Inventory);
+            this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
 
             var container = this._redDot.Get<int>(TestCategory.Inventory);
 
@@ -76,7 +76,7 @@ namespace RedDotSour.Tests
         [Test]
         public void Get_TypeMismatch_ThrowsInvalidCastException()
         {
-            this._redDot.Create<int>(TestCategory.Inventory);
+            this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
 
             Assert.Throws<InvalidCastException>(() =>
                 this._redDot.Get<long>(TestCategory.Inventory));
@@ -85,7 +85,7 @@ namespace RedDotSour.Tests
         [Test]
         public void Get_ReturnsSameInstance()
         {
-            var created = this._redDot.Create<int>(TestCategory.Inventory);
+            var created = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
             var got = this._redDot.Get<int>(TestCategory.Inventory);
 
             Assert.AreSame(created, got);
@@ -98,7 +98,7 @@ namespace RedDotSour.Tests
         [Test]
         public void IsOn_RegisteredKey_ReturnsTrue()
         {
-            var container = this._redDot.Create<int>(TestCategory.Inventory);
+            var container = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
             container.Register(1);
 
             Assert.IsTrue(this._redDot.IsOn(TestCategory.Inventory, 1));
@@ -107,7 +107,7 @@ namespace RedDotSour.Tests
         [Test]
         public void IsOn_MarkedKey_ReturnsFalse()
         {
-            var container = this._redDot.Create<int>(TestCategory.Inventory);
+            var container = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
             container.Register(1);
             container.Mark(1);
 
@@ -127,7 +127,7 @@ namespace RedDotSour.Tests
         [Test]
         public void IsOnAny_WithUnmarkedKeys_ReturnsTrue()
         {
-            var container = this._redDot.Create<int>(TestCategory.Inventory);
+            var container = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
             container.Register(1);
 
             Assert.IsTrue(this._redDot.IsOnAny(TestCategory.Inventory));
@@ -142,7 +142,7 @@ namespace RedDotSour.Tests
         [Test]
         public void CountOn_ReturnsContainerCount()
         {
-            var container = this._redDot.Create<int>(TestCategory.Inventory);
+            var container = this._redDot.Create<int>(TestCategory.Inventory, k => k.ToString(), int.Parse);
             container.Register(1);
             container.Register(2);
             container.Register(3);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RedDotSour.Persistence;
 
 namespace RedDotSour.Core
 {
@@ -10,9 +11,23 @@ namespace RedDotSour.Core
         private readonly HashSet<TKey> _dirtyKeys = new();
         private int _onCount;
 
+        private readonly Func<TKey, string> _keySerializer;
+        private readonly Func<string, TKey> _keyDeserializer;
+
         public event Action OnChanged;
 
+        public string CategoryName { get; }
         public int DirtyCount => this._dirtyKeys.Count;
+
+        public RedDotContainer(
+            string categoryName,
+            Func<TKey, string> keySerializer,
+            Func<string, TKey> keyDeserializer)
+        {
+            this.CategoryName = categoryName;
+            this._keySerializer = keySerializer;
+            this._keyDeserializer = keyDeserializer;
+        }
 
         /// <summary>
         /// 키를 등록한다. 미확인(null) 상태로 추가되어 빨콩이 켜진다.
@@ -195,6 +210,55 @@ namespace RedDotSour.Core
         {
             this._dirtyKeys.Clear();
         }
+
+        #region Serialization
+
+        public List<RedDotSaveData.RecordData> ExportDirtyRecords()
+        {
+            var records = new List<RedDotSaveData.RecordData>();
+            foreach (var key in this._dirtyKeys)
+            {
+                if (this._table.TryGetValue(key, out var checkedAt))
+                {
+                    records.Add(new RedDotSaveData.RecordData
+                    {
+                        key = this._keySerializer(key),
+                        checkedAtTicks = checkedAt?.Ticks ?? 0
+                    });
+                }
+            }
+
+            return records;
+        }
+
+        public List<RedDotSaveData.RecordData> ExportAllRecords()
+        {
+            var records = new List<RedDotSaveData.RecordData>();
+            foreach (var kv in this._table)
+            {
+                records.Add(new RedDotSaveData.RecordData
+                {
+                    key = this._keySerializer(kv.Key),
+                    checkedAtTicks = kv.Value?.Ticks ?? 0
+                });
+            }
+
+            return records;
+        }
+
+        public void ImportRecords(List<RedDotSaveData.RecordData> records)
+        {
+            foreach (var rec in records)
+            {
+                var key = this._keyDeserializer(rec.key);
+                var checkedAt = rec.checkedAtTicks == 0
+                    ? (DateTime?)null
+                    : new DateTime(rec.checkedAtTicks);
+                this.LoadRecord(key, checkedAt);
+            }
+        }
+
+        #endregion
 
         private void RaiseOnChanged()
         {

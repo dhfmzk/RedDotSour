@@ -14,7 +14,10 @@ namespace RedDotSour.Tests
         [SetUp]
         public void SetUp()
         {
-            this._container = new RedDotContainer<int>();
+            this._container = new RedDotContainer<int>(
+                "Test",
+                k => k.ToString(),
+                s => int.Parse(s));
         }
 
         #region Register
