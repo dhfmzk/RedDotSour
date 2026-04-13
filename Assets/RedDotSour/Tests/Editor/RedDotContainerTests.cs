@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using RedDotSour.Core;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace RedDotSour.Tests
 {
@@ -356,6 +358,7 @@ namespace RedDotSour.Tests
             this._container.OnChanged += () => throw new Exception("boom");
             this._container.OnChanged += () => secondFired = true;
 
+            LogAssert.Expect(LogType.Exception, "Exception: boom");
             this._container.Register(1);
 
             Assert.IsTrue(secondFired);
