@@ -1,9 +1,6 @@
 # Changelog
 
-## [2.0.0] - 2026-04-13
-
-### Breaking Changes
-- v1.0 전체 삭제 및 아키텍처 재설계
+## [0.0.1] - 2026-04-14
 
 ### Added
 - `RedDotSour<TCategory>` — 카테고리 기반 메인 API

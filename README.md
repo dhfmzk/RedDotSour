@@ -2,9 +2,7 @@
 
 Unity용 레드닷(알림 뱃지) 시스템 라이브러리
 
----
-
-## Overview
+## 🔍 Overview
 
 게임 UI에서 미확인 항목을 표시하는 레드닷(빨간 점) 시스템입니다.
 
@@ -13,7 +11,7 @@ Unity용 레드닷(알림 뱃지) 시스템 라이브러리
 - **`DateTime?` 단일 값** — `null`이면 미확인(빨콩), 값이 있으면 확인 완료
 - **UI 미포함** — 데이터 컨테이너만 제공, UI 구현은 사용자 영역
 
-## Quick Start
+## 🚀 Quick Start
 
 ```csharp
 // 1. 카테고리 정의
@@ -53,7 +51,7 @@ redDot.CountOn(MyCategory.Inventory);  // 2
 inventory.Unmark(1001);  // 빨콩 다시 ON
 ```
 
-## Architecture
+## 🏗️ Architecture
 
 ```
 RedDotSour<TCategory>
@@ -90,7 +88,7 @@ RedDotSour<TCategory>
 | `CountOn()` | 빨콩 개수 |
 | `ClearAll()` | 전체 제거 |
 
-## Persistence
+## 💾 Persistence
 
 `IRedDotPersistence` 인터페이스를 통해 영속화를 지원합니다.
 
@@ -114,7 +112,7 @@ redDot.Load();      // snapshot + journal 재생
 redDot.SetPersistence(new PlayerPrefsPersistence());
 ```
 
-### Event-Driven UI
+## 🔔 Event-Driven UI
 
 ```csharp
 container.OnChanged += () =>
@@ -123,7 +121,7 @@ container.OnChanged += () =>
 };
 ```
 
-## Installation
+## 📦 Installation
 
 ### UPM (Git URL)
 
@@ -133,11 +131,11 @@ Unity Package Manager > Add package from git URL:
 https://github.com/dhfmzk/RedDotSour.git?path=Assets/RedDotSour
 ```
 
-## Requirements
+## ⚙️ Requirements
 
 - Unity 2022.3+
 - 외부 의존성 없음
 
-## License
+## 📄 License
 
 MIT License - see [LICENSE](./LICENSE) for details.

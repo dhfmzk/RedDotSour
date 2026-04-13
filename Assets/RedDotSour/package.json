@@ -1,6 +1,6 @@
 {
     "name": "com.dhfmzk.reddotsour",
-    "version": "2.0.0",
+    "version": "0.0.1",
     "displayName": "RedDotSour",
     "description": "Lightweight red dot (notification badge) system for Unity. Category-based, generic keys, event-driven, zero external dependencies.",
     "unity": "2022.3",
