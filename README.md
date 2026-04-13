@@ -27,8 +27,9 @@ public enum MyCategory
 // 2. 인스턴스 생성
 var redDot = new RedDotSour<MyCategory>();
 
-// 3. 카테고리별 컨테이너 생성 (키 타입은 이 시점에 결정)
-var inventory = redDot.Create<int>(MyCategory.Inventory);
+// 3. 카테고리별 컨테이너 생성 (키 타입 + 시리얼라이저)
+var inventory = redDot.Create<int>(
+    MyCategory.Inventory, k => k.ToString(), int.Parse);
 
 // 4. 아이템 등록 — 미확인(null) 상태로 추가, 빨콩 ON
 inventory.Register(1001);
@@ -89,9 +90,53 @@ RedDotSour<TCategory>
 | `CountOn()` | 빨콩 개수 |
 | `ClearAll()` | 전체 제거 |
 
+## Persistence
+
+`IRedDotPersistence` 인터페이스를 통해 영속화를 지원합니다.
+
+### JournalFilePersistence (기본, 권장)
+
+Snapshot + Journal + Compact 패턴. dirty만 append, Compact 시 전체 재작성.
+
+```csharp
+redDot.SetPersistence(new JournalFilePersistence());
+
+redDot.Save();      // dirty만 journal에 append
+redDot.Compact();   // 전체 snapshot 재작성 + journal 삭제
+redDot.Load();      // snapshot + journal 재생
+```
+
+### PlayerPrefsPersistence (소규모 전용)
+
+~100건 이하 데이터에만 권장.
+
+```csharp
+redDot.SetPersistence(new PlayerPrefsPersistence());
+```
+
+### Event-Driven UI
+
+```csharp
+container.OnChanged += () =>
+{
+    badge.SetActive(container.IsOnAny());
+};
+```
+
+## Installation
+
+### UPM (Git URL)
+
+Unity Package Manager > Add package from git URL:
+
+```
+https://github.com/dhfmzk/RedDotSour.git?path=Assets/RedDotSour
+```
+
 ## Requirements
 
 - Unity 2022.3+
+- 외부 의존성 없음
 
 ## License
 

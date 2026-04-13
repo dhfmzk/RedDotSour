@@ -1,13 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RedDotSour.Persistence;
 
 namespace RedDotSour.Core
 {
-    public class RedDotSour<TCategory> where TCategory : Enum
+    public class RedDotSour<TCategory> : IRedDotSourInstance where TCategory : Enum
     {
         private readonly Dictionary<TCategory, IRedDotContainer> _containers = new();
         private IRedDotPersistence _persistence;
+
+        public RedDotSour()
+        {
+            RedDotSourRegistry.Register(this);
+        }
+
+        public IReadOnlyDictionary<string, IRedDotContainer> GetContainersByName()
+        {
+            return this._containers.ToDictionary(
+                kv => kv.Key.ToString(),
+                kv => kv.Value);
+        }
 
         /// <summary>
         /// 영속화 구현체를 설정한다.

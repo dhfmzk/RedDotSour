@@ -1,0 +1,24 @@
+{
+    "name": "com.dhfmzk.reddotsour",
+    "version": "2.0.0",
+    "displayName": "RedDotSour",
+    "description": "Lightweight red dot (notification badge) system for Unity. Category-based, generic keys, event-driven, zero external dependencies.",
+    "unity": "2022.3",
+    "author": {
+        "name": "dhfmzk",
+        "url": "https://github.com/dhfmzk"
+    },
+    "keywords": [
+        "red-dot",
+        "notification",
+        "badge",
+        "ui"
+    ],
+    "samples": [
+        {
+            "displayName": "Basic Sample",
+            "description": "GameManager, ControlPanel, RedDotBadge example",
+            "path": "Samples~/BasicSample"
+        }
+    ]
+}
