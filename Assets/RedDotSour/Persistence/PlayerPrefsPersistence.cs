@@ -15,11 +15,19 @@ namespace RedDotSour.Persistence
             this._key = key;
         }
 
+        /// <summary>
+        /// dirty records를 기존 데이터에 머지하여 저장한다.
+        /// </summary>
         public void Save(RedDotSaveData data)
         {
-            this.WriteData(data);
+            var existing = this.Load();
+            MergeInto(existing, data);
+            this.WriteData(existing);
         }
 
+        /// <summary>
+        /// 전체 데이터를 저장한다. Compact용.
+        /// </summary>
         public void SaveAll(RedDotSaveData fullData)
         {
             this.WriteData(fullData);
@@ -33,7 +41,10 @@ namespace RedDotSour.Persistence
                 return new RedDotSaveData();
             }
 
-            return JsonUtility.FromJson<RedDotSaveData>(json) ?? new RedDotSaveData();
+            var data = JsonUtility.FromJson<RedDotSaveData>(json);
+            if (data == null) return new RedDotSaveData();
+            if (data.categories == null) data.categories = new();
+            return data;
         }
 
         public void Clear()
@@ -47,6 +58,51 @@ namespace RedDotSour.Persistence
             var json = JsonUtility.ToJson(data, false);
             PlayerPrefs.SetString(this._key, json);
             PlayerPrefs.Save();
+        }
+
+        private static void MergeInto(RedDotSaveData target, RedDotSaveData delta)
+        {
+            if (delta.categories == null) return;
+
+            foreach (var deltaCat in delta.categories)
+            {
+                if (deltaCat.records == null) continue;
+
+                RedDotSaveData.CategoryData targetCat = null;
+                foreach (var cat in target.categories)
+                {
+                    if (cat.categoryName == deltaCat.categoryName)
+                    {
+                        targetCat = cat;
+                        break;
+                    }
+                }
+
+                if (targetCat == null)
+                {
+                    target.categories.Add(deltaCat);
+                    continue;
+                }
+
+                foreach (var deltaRec in deltaCat.records)
+                {
+                    var found = false;
+                    for (var i = 0; i < targetCat.records.Count; i++)
+                    {
+                        if (targetCat.records[i].key == deltaRec.key)
+                        {
+                            targetCat.records[i] = deltaRec;
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        targetCat.records.Add(deltaRec);
+                    }
+                }
+            }
         }
     }
 }

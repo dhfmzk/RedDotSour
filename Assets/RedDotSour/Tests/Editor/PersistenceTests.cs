@@ -103,7 +103,7 @@ namespace RedDotSour.Tests
 
             var records = new List<RedDotSaveData.RecordData>
             {
-                new() { key = "10", checkedAtTicks = 0 },
+                new() { key = "10", checkedAtTicks = RedDotSaveData.RecordData.NullSentinel },
                 new() { key = "20", checkedAtTicks = new DateTime(2026, 4, 12).Ticks },
             };
 
@@ -115,14 +115,14 @@ namespace RedDotSour.Tests
         }
 
         [Test]
-        public void ImportRecords_CheckedAtTicks_Zero_IsNull()
+        public void ImportRecords_CheckedAtTicks_NullSentinel_IsNull()
         {
             var inv = this._redDot.Create<int>(
                 PersistTestCategory.Inventory, k => k.ToString(), int.Parse);
 
             inv.ImportRecords(new List<RedDotSaveData.RecordData>
             {
-                new() { key = "1", checkedAtTicks = 0 }
+                new() { key = "1", checkedAtTicks = RedDotSaveData.RecordData.NullSentinel }
             });
 
             inv.TryGet(1, out var record);
@@ -235,7 +235,7 @@ namespace RedDotSour.Tests
                         categoryName = "Inventory",
                         records = new()
                         {
-                            new() { key = "100", checkedAtTicks = 0 },
+                            new() { key = "100", checkedAtTicks = RedDotSaveData.RecordData.NullSentinel },
                             new() { key = "200", checkedAtTicks = new DateTime(2026, 1, 1).Ticks },
                         }
                     }
@@ -264,7 +264,7 @@ namespace RedDotSour.Tests
                         categoryName = "NonExistent",
                         records = new()
                         {
-                            new() { key = "1", checkedAtTicks = 0 }
+                            new() { key = "1", checkedAtTicks = RedDotSaveData.RecordData.NullSentinel }
                         }
                     }
                 }

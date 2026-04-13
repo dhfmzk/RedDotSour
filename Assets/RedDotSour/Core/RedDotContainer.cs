@@ -4,7 +4,7 @@ using RedDotSour.Persistence;
 
 namespace RedDotSour.Core
 {
-    public class RedDotContainer<TKey> : IRedDotContainer
+    public class RedDotContainer<TKey> : IRedDotContainer, IRedDotContainerPersistence
         where TKey : struct, IEquatable<TKey>
     {
         private readonly Dictionary<TKey, DateTime?> _table = new();
@@ -61,6 +61,12 @@ namespace RedDotSour.Core
             if (!this._table.TryGetValue(key, out var current))
             {
                 throw new KeyNotFoundException($"Key '{key}' is not registered.");
+            }
+
+            // 멱등성: 동일 값이면 skip
+            if (current != null && current.Value == at)
+            {
+                return;
             }
 
             if (current == null)
@@ -195,12 +201,28 @@ namespace RedDotSour.Core
         /// </summary>
         public void LoadRecord(TKey key, DateTime? checkedAt)
         {
-            this._table[key] = checkedAt;
-
-            if (checkedAt == null)
+            if (this._table.TryGetValue(key, out var existing))
             {
-                this._onCount++;
+                // 기존 키: 이전 상태와 새 상태 비교하여 _onCount 보정
+                if (existing == null && checkedAt != null)
+                {
+                    this._onCount--;
+                }
+                else if (existing != null && checkedAt == null)
+                {
+                    this._onCount++;
+                }
             }
+            else
+            {
+                // 신규 키
+                if (checkedAt == null)
+                {
+                    this._onCount++;
+                }
+            }
+
+            this._table[key] = checkedAt;
         }
 
         /// <summary>
@@ -223,7 +245,7 @@ namespace RedDotSour.Core
                     records.Add(new RedDotSaveData.RecordData
                     {
                         key = this._keySerializer(key),
-                        checkedAtTicks = checkedAt?.Ticks ?? 0
+                        checkedAtTicks = checkedAt?.Ticks ?? RedDotSaveData.RecordData.NullSentinel
                     });
                 }
             }
@@ -239,7 +261,7 @@ namespace RedDotSour.Core
                 records.Add(new RedDotSaveData.RecordData
                 {
                     key = this._keySerializer(kv.Key),
-                    checkedAtTicks = kv.Value?.Ticks ?? 0
+                    checkedAtTicks = kv.Value?.Ticks ?? RedDotSaveData.RecordData.NullSentinel
                 });
             }
 
@@ -251,7 +273,7 @@ namespace RedDotSour.Core
             foreach (var rec in records)
             {
                 var key = this._keyDeserializer(rec.key);
-                var checkedAt = rec.checkedAtTicks == 0
+                var checkedAt = rec.checkedAtTicks == RedDotSaveData.RecordData.NullSentinel
                     ? (DateTime?)null
                     : new DateTime(rec.checkedAtTicks);
                 this.LoadRecord(key, checkedAt);

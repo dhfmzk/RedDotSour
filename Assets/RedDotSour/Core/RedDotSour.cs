@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using RedDotSour.Persistence;
 
 namespace RedDotSour.Core
@@ -10,16 +9,11 @@ namespace RedDotSour.Core
         private readonly Dictionary<TCategory, IRedDotContainer> _containers = new();
         private IRedDotPersistence _persistence;
 
+        IReadOnlyCollection<IRedDotContainer> IRedDotSourInstance.Containers => this._containers.Values;
+
         public RedDotSour()
         {
             RedDotSourRegistry.Register(this);
-        }
-
-        public IReadOnlyDictionary<string, IRedDotContainer> GetContainersByName()
-        {
-            return this._containers.ToDictionary(
-                kv => kv.Key.ToString(),
-                kv => kv.Value);
         }
 
         /// <summary>
@@ -123,7 +117,7 @@ namespace RedDotSour.Core
 
             foreach (var container in this._containers.Values)
             {
-                container.ClearDirty();
+                ((IRedDotContainerPersistence)container).ClearDirty();
             }
         }
 
@@ -139,7 +133,7 @@ namespace RedDotSour.Core
 
             foreach (var container in this._containers.Values)
             {
-                container.ClearDirty();
+                ((IRedDotContainerPersistence)container).ClearDirty();
             }
         }
 
@@ -159,12 +153,13 @@ namespace RedDotSour.Core
             var data = new RedDotSaveData();
             foreach (var container in this._containers.Values)
             {
-                if (container.DirtyCount == 0) continue;
+                var p = (IRedDotContainerPersistence)container;
+                if (p.DirtyCount == 0) continue;
 
                 data.categories.Add(new RedDotSaveData.CategoryData
                 {
                     categoryName = container.CategoryName,
-                    records = container.ExportDirtyRecords()
+                    records = p.ExportDirtyRecords()
                 });
             }
 
@@ -176,10 +171,11 @@ namespace RedDotSour.Core
             var data = new RedDotSaveData();
             foreach (var container in this._containers.Values)
             {
+                var p = (IRedDotContainerPersistence)container;
                 data.categories.Add(new RedDotSaveData.CategoryData
                 {
                     categoryName = container.CategoryName,
-                    records = container.ExportAllRecords()
+                    records = p.ExportAllRecords()
                 });
             }
 
@@ -188,6 +184,8 @@ namespace RedDotSour.Core
 
         private void ImportSaveData(RedDotSaveData data)
         {
+            if (data?.categories == null) return;
+
             var nameToContainer = new Dictionary<string, IRedDotContainer>();
             foreach (var kv in this._containers)
             {
@@ -196,9 +194,11 @@ namespace RedDotSour.Core
 
             foreach (var catData in data.categories)
             {
+                if (catData?.records == null) continue;
+
                 if (nameToContainer.TryGetValue(catData.categoryName, out var container))
                 {
-                    container.ImportRecords(catData.records);
+                    ((IRedDotContainerPersistence)container).ImportRecords(catData.records);
                 }
             }
         }

@@ -68,6 +68,6 @@ Assets/RedDotSour/           ← UPM 패키지 루트
 
 - `Samples~/` 디렉토리는 Unity가 컴파일하지 않음 (UPM 샘플 규약)
 - `.meta` 파일은 항상 함께 관리할 것
-- ScriptableObject 싱글톤 패턴은 v2.0에서 제거됨 — `RedDotSourRegistry` 정적 클래스로 대체
-- SQLite 영속화는 stub만 유지, 구현은 나중에
+- 전역 접근: `RedDotSour<TCategory>.I` (첫 생성 시 자동 설정)
+- 에디터 디버그: `RedDotSourRegistry`로 인스턴스 추적
 - UI 컴포넌트(RedDotBadge 등)는 라이브러리에 포함하지 않음 — 데이터 컨테이너 + 이벤트만 제공

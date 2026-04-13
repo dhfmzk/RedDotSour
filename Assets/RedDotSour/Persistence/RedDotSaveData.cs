@@ -19,7 +19,8 @@ namespace RedDotSour.Persistence
         public class RecordData
         {
             public string key;
-            public long checkedAtTicks;  // DateTime?.Ticks. 0 = null (미확인)
+            public long checkedAtTicks;  // DateTime?.Ticks. -1 = null (미확인)
+            public const long NullSentinel = -1;
         }
     }
 }

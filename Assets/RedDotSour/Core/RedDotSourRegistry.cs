@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace RedDotSour.Core
 {
@@ -7,7 +8,13 @@ namespace RedDotSour.Core
     /// </summary>
     public static class RedDotSourRegistry
     {
-        private static readonly List<IRedDotSourInstance> _instances = new();
+        private static List<IRedDotSourInstance> _instances = new();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetOnDomainReload()
+        {
+            _instances = new List<IRedDotSourInstance>();
+        }
 
         public static IReadOnlyList<IRedDotSourInstance> Instances => _instances;
 
@@ -32,6 +39,6 @@ namespace RedDotSour.Core
 
     public interface IRedDotSourInstance
     {
-        IReadOnlyDictionary<string, IRedDotContainer> GetContainersByName();
+        IReadOnlyCollection<IRedDotContainer> Containers { get; }
     }
 }

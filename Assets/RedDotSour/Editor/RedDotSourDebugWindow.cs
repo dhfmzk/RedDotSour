@@ -68,14 +68,12 @@ namespace RedDotSour.Editor
 
         private void DrawInstance(int index, IRedDotSourInstance instance)
         {
-            var containers = instance.GetContainersByName();
-
             EditorGUILayout.LabelField($"Instance #{index}", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
 
-            foreach (var kv in containers)
+            foreach (var container in instance.Containers)
             {
-                this.DrawContainer(kv.Key, kv.Value);
+                this.DrawContainer(container.CategoryName, container);
             }
 
             EditorGUI.indentLevel--;
@@ -90,7 +88,8 @@ namespace RedDotSour.Editor
             }
 
             var countOn = container.CountOn();
-            var dirtyCount = container.DirtyCount;
+            var persistence = container as IRedDotContainerPersistence;
+            var dirtyCount = persistence?.DirtyCount ?? 0;
             var header = $"{categoryName}  [On: {countOn} | Dirty: {dirtyCount}]";
 
             this._foldouts[categoryName] = EditorGUILayout.Foldout(
@@ -121,7 +120,7 @@ namespace RedDotSour.Editor
 
             if (GUILayout.Button("Clear Dirty", GUILayout.Width(100)))
             {
-                container.ClearDirty();
+                persistence?.ClearDirty();
             }
 
             EditorGUI.indentLevel--;

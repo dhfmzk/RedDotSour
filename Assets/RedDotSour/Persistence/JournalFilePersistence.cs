@@ -49,18 +49,20 @@ namespace RedDotSour.Persistence
         {
             var json = JsonUtility.ToJson(fullData, false);
 
-            // atomic write: temp → rename
             var tempPath = this._snapshotPath + ".tmp";
             File.WriteAllText(tempPath, json);
 
             if (File.Exists(this._snapshotPath))
             {
-                File.Delete(this._snapshotPath);
+                // atomic replace: 기존 snapshot을 temp로 교체
+                File.Replace(tempPath, this._snapshotPath, null);
+            }
+            else
+            {
+                File.Move(tempPath, this._snapshotPath);
             }
 
-            File.Move(tempPath, this._snapshotPath);
-
-            // journal 삭제
+            // snapshot 확정 후에만 journal 삭제
             if (File.Exists(this._journalPath))
             {
                 File.Delete(this._journalPath);
@@ -99,7 +101,10 @@ namespace RedDotSour.Persistence
                 return new RedDotSaveData();
             }
 
-            return JsonUtility.FromJson<RedDotSaveData>(json) ?? new RedDotSaveData();
+            var data = JsonUtility.FromJson<RedDotSaveData>(json);
+            if (data == null) return new RedDotSaveData();
+            if (data.categories == null) data.categories = new();
+            return data;
         }
 
         private void ReplayJournal(RedDotSaveData data)
